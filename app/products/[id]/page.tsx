@@ -50,7 +50,7 @@ type Product = {
   sizeGuide?: SpecificationTable | null;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+const API_URL ="https://brand-gallery-backend.brand-gallery.workers.dev";
 
 async function getProduct(id: string): Promise<Product | null> {
   try {
@@ -73,6 +73,14 @@ async function getProduct(id: string): Promise<Product | null> {
     return null;
   }
 }
+
+
+const GOOGLE_PLAY_URL =
+  "https://play.google.com/store/apps/details?id=com.slliman.userapp";
+
+const APP_STORE_URL =
+  "https://apps.apple.com/us/app/brand-gallery-shopping/id6793068378";
+
 
 export default async function ProductPage({
   params,
@@ -561,23 +569,27 @@ export default async function ProductPage({
 
               </div>
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
 
-                <a
-                  href="#"
-                  className="flex flex-1 items-center justify-center rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
-                >
-                  Open in App
-                </a>
+  <a
+    href={APP_STORE_URL}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex flex-1 items-center justify-center rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
+  >
+    Open in App
+  </a>
 
-                <a
-                  href="#"
-                  className="flex flex-1 items-center justify-center rounded-full border border-zinc-700 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-900"
-                >
-                  Install App
-                </a>
+  <a
+    href={GOOGLE_PLAY_URL}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex flex-1 items-center justify-center rounded-full border border-zinc-700 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-900"
+  >
+    Install App
+  </a>
 
-              </div>
+</div>
 
             </div>
 
