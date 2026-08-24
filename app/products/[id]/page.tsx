@@ -569,7 +569,8 @@ export default async function ProductPage({
 
               </div>
 
-         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+
+<div className="mt-6 flex flex-col gap-3 sm:flex-row">
 
   <a
     href={APP_STORE_URL}
@@ -577,7 +578,7 @@ export default async function ProductPage({
     rel="noopener noreferrer"
     className="flex flex-1 items-center justify-center rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
   >
-    Open in App
+    App Store
   </a>
 
   <a
@@ -586,10 +587,11 @@ export default async function ProductPage({
     rel="noopener noreferrer"
     className="flex flex-1 items-center justify-center rounded-full border border-zinc-700 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-zinc-900"
   >
-    Install App
+    Google Play
   </a>
 
 </div>
+
 
             </div>
 
