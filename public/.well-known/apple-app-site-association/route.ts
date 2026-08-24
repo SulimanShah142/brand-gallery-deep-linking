@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  return NextResponse.json(
-    {
+  return new NextResponse(
+    JSON.stringify({
       applinks: {
         apps: [],
         details: [
@@ -12,9 +12,11 @@ export async function GET() {
           },
         ],
       },
-    },
+    }),
     {
+      status: 200,
       headers: {
+        "Content-Type": "application/json",
         "Cache-Control": "public, max-age=3600",
       },
     }
