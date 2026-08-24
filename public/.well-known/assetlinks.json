@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.slliman.userapp",
+      "sha256_cert_fingerprints": [
+        "39:50:62:05:B6:F5:B4:53:74:C3:5F:06:27:A7:5A:4B:07:5C:CF:34:50:A0:49:01:55:D1:2C:96:38:E3:0F:2C"
+      ]
+    }
+  }
+]

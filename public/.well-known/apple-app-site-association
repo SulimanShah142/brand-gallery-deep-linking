@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "5AQ7N2L38R.com.slliman.userapp"
+        ],
+        "components": [
+          {
+            "/": "/products/*"
+          }
+        ]
+      }
+    ]
+  }
+}
