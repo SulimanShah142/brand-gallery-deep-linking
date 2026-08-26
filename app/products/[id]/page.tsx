@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from "react";
@@ -13,28 +14,41 @@ const APP_SCHEME = "userapp";
 export default function ProductBridge() {
   useEffect(() => {
     const userAgent =
-      navigator.userAgent || navigator.vendor || "";
+      navigator.userAgent ||
+      navigator.vendor ||
+      "";
 
     const isIOS =
       /iPad|iPhone|iPod/.test(userAgent) &&
       !(window as any).MSStream;
 
-    const isAndroid = /android/i.test(userAgent);
+    const isAndroid =
+      /android/i.test(userAgent);
 
     // ---------------------------------------------------------
-    // GET PRODUCT ID FROM:
+    // Only handle mobile devices.
+    // ---------------------------------------------------------
+
+    if (!isIOS && !isAndroid) {
+      return;
+    }
+
+    // ---------------------------------------------------------
+    // Extract:
     //
-    // https://brand-gallery-deep-linking.vercel.app/product/UUID
+    // /product/<id>
     //
     // ---------------------------------------------------------
 
-    const pathParts = window.location.pathname
-      .split("/")
-      .filter(Boolean);
+    const pathParts =
+      window.location.pathname
+        .split("/")
+        .filter(Boolean);
 
     const productIndex =
       pathParts.findIndex(
-        (part) => part.toLowerCase() === "product"
+        (part) =>
+          part.toLowerCase() === "product"
       );
 
     const productId =
@@ -42,25 +56,14 @@ export default function ProductBridge() {
         ? pathParts[productIndex + 1]
         : null;
 
-    // ---------------------------------------------------------
-    // If there is no product ID, don't attempt a deep link.
-    // ---------------------------------------------------------
-
     if (!productId) {
       return;
     }
 
     // ---------------------------------------------------------
-    // Native deep-link URL
+    // Native application URL
     //
-    // This should resolve to:
-    //
-    // userapp://product/3a755b24-2c17-414c-a429-7f4c4b92102c
-    //
-    // Expo Router should then open:
-    //
-    // app/(shop)/product/[id].tsx
-    //
+    // userapp://product/<id>
     // ---------------------------------------------------------
 
     const nativeUrl =
@@ -69,6 +72,11 @@ export default function ProductBridge() {
       )}`;
 
     let appOpened = false;
+
+    // ---------------------------------------------------------
+    // If the browser becomes hidden, the OS has most likely
+    // handed control to the native application.
+    // ---------------------------------------------------------
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -82,19 +90,23 @@ export default function ProductBridge() {
     );
 
     // ---------------------------------------------------------
-    // Attempt to open the native application.
+    // Try opening the native app IMMEDIATELY.
     // ---------------------------------------------------------
 
-    if (isAndroid || isIOS) {
-      window.location.href = nativeUrl;
+    window.location.href = nativeUrl;
 
-      // -------------------------------------------------------
-      // Fallback to the store only if the app did not open.
-      //
-      // The timeout gives the OS time to launch the app.
-      // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // Very short fallback.
+    //
+    // If the app exists:
+    //   Browser becomes hidden → no store redirect.
+    //
+    // If the app doesn't exist:
+    //   Browser remains visible → store opens.
+    // ---------------------------------------------------------
 
-      const fallbackTimer = window.setTimeout(() => {
+    const fallbackTimer =
+      window.setTimeout(() => {
         if (appOpened || document.hidden) {
           return;
         }
@@ -111,24 +123,17 @@ export default function ProductBridge() {
             APP_STORE_URL
           );
         }
-      }, 1800);
-
-      return () => {
-        window.clearTimeout(fallbackTimer);
-
-        document.removeEventListener(
-          "visibilitychange",
-          handleVisibilityChange
-        );
-      };
-    }
+      }, 800);
 
     // ---------------------------------------------------------
-    // Desktop:
-    // Don't redirect to either mobile store.
+    // Cleanup
     // ---------------------------------------------------------
 
     return () => {
+      window.clearTimeout(
+        fallbackTimer
+      );
+
       document.removeEventListener(
         "visibilitychange",
         handleVisibilityChange
@@ -146,7 +151,7 @@ export default function ProductBridge() {
         </h1>
 
         <p className="mt-2 text-sm text-zinc-500">
-          Opening the product in the Brand Gallery app...
+          Opening the product...
         </p>
       </div>
     </main>
