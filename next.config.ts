@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Intercepts the public static path
         source: '/.well-known/apple-app-site-association',
         headers: [
           {
@@ -13,7 +12,20 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Disposition',
-            value: 'inline', // Prevents the browser from forcing a local download
+            value: 'inline',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/assetlinks.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+          {
+            key: 'Content-Disposition',
+            value: 'inline',
           },
         ],
       },

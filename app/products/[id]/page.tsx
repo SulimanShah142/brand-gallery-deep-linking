@@ -9,6 +9,7 @@ const APP_STORE_URL =
 const GOOGLE_PLAY_URL =
   "https://play.google.com/store/apps/details?id=com.slliman.userapp";
 
+const PACKAGE_NAME = "com.slliman.userapp";
 const APP_SCHEME = "userapp";
 
 export default function ProductBridge() {
@@ -29,15 +30,14 @@ export default function ProductBridge() {
     // Only handle mobile devices.
     // ---------------------------------------------------------
 
-    if (!isIOS && !isAndroid) {
+    if (!isAndroid && !isIOS) {
       return;
     }
 
     // ---------------------------------------------------------
-    // Extract:
+    // Extract product ID from:
     //
     // /product/<id>
-    //
     // ---------------------------------------------------------
 
     const pathParts =
@@ -60,85 +60,98 @@ export default function ProductBridge() {
       return;
     }
 
-    // ---------------------------------------------------------
-    // Native application URL
+    const encodedProductId =
+      encodeURIComponent(productId);
+
+    // =========================================================
+    // ANDROID
+    // =========================================================
     //
-    // userapp://product/<id>
-    // ---------------------------------------------------------
-
-    const nativeUrl =
-      `${APP_SCHEME}://product/${encodeURIComponent(
-        productId
-      )}`;
-
-    let appOpened = false;
-
-    // ---------------------------------------------------------
-    // If the browser becomes hidden, the OS has most likely
-    // handed control to the native application.
-    // ---------------------------------------------------------
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        appOpened = true;
-      }
-    };
-
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibilityChange
-    );
-
-    // ---------------------------------------------------------
-    // Try opening the native app IMMEDIATELY.
-    // ---------------------------------------------------------
-
-    window.location.href = nativeUrl;
-
-    // ---------------------------------------------------------
-    // Very short fallback.
+    // Android handles the installed-app decision.
     //
-    // If the app exists:
-    //   Browser becomes hidden → no store redirect.
+    // If Brand Gallery exists:
     //
-    // If the app doesn't exist:
-    //   Browser remains visible → store opens.
-    // ---------------------------------------------------------
+    //   → opens Brand Gallery
+    //
+    // If Brand Gallery does not exist:
+    //
+    //   → browser fallback → Google Play
+    //
+    // =========================================================
 
-    const fallbackTimer =
-      window.setTimeout(() => {
-        if (appOpened || document.hidden) {
-          return;
+    if (isAndroid) {
+      const intentUrl =
+        `intent://product/${encodedProductId}` +
+        `#Intent;` +
+        `scheme=${APP_SCHEME};` +
+        `package=${PACKAGE_NAME};` +
+        `S.browser_fallback_url=${encodeURIComponent(
+          GOOGLE_PLAY_URL
+        )};` +
+        `end`;
+
+      window.location.replace(intentUrl);
+
+      return;
+    }
+
+    // =========================================================
+    // IOS
+    // =========================================================
+    //
+    // iOS custom schemes don't provide the same reliable
+    // browser-side installed-app detection.
+    //
+    // Try the native app first and use a short fallback.
+    //
+    // Universal Links should ultimately be the primary
+    // mechanism for iOS.
+    // =========================================================
+
+    if (isIOS) {
+      const nativeUrl =
+        `${APP_SCHEME}://product/${encodedProductId}`;
+
+      let appOpened = false;
+
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          appOpened = true;
         }
+      };
 
-        if (isAndroid) {
-          window.location.replace(
-            GOOGLE_PLAY_URL
-          );
-          return;
-        }
-
-        if (isIOS) {
-          window.location.replace(
-            APP_STORE_URL
-          );
-        }
-      }, 800);
-
-    // ---------------------------------------------------------
-    // Cleanup
-    // ---------------------------------------------------------
-
-    return () => {
-      window.clearTimeout(
-        fallbackTimer
-      );
-
-      document.removeEventListener(
+      document.addEventListener(
         "visibilitychange",
         handleVisibilityChange
       );
-    };
+
+      window.location.href = nativeUrl;
+
+      const fallbackTimer =
+        window.setTimeout(() => {
+          if (
+            appOpened ||
+            document.hidden
+          ) {
+            return;
+          }
+
+          window.location.replace(
+            APP_STORE_URL
+          );
+        }, 1200);
+
+      return () => {
+        window.clearTimeout(
+          fallbackTimer
+        );
+
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
+      };
+    }
   }, []);
 
   return (
@@ -157,4 +170,3 @@ export default function ProductBridge() {
     </main>
   );
 }
-

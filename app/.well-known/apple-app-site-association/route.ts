@@ -7,7 +7,11 @@ export async function GET() {
       details: [
         {
           appID: "5AQ7N2L38R.com.slliman.userapp",
-          paths: ["/products/*"],
+          paths: [
+            "/product/*",
+            "/products/*",
+            "/",
+          ],
         },
       ],
     },
