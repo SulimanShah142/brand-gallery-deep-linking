@@ -90,9 +90,15 @@ export default function ProductBridge() {
         )};` +
         `end`;
 
-      window.location.replace(intentUrl);
+      const fallbackTimer = window.setTimeout(() => {
+        window.location.replace(GOOGLE_PLAY_URL);
+      }, 1500);
 
-      return;
+      window.location.href = intentUrl;
+
+      return () => {
+        window.clearTimeout(fallbackTimer);
+      };
     }
 
     // =========================================================

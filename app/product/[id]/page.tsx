@@ -40,8 +40,15 @@ export default function ProductBridge() {
         `S.browser_fallback_url=${encodeURIComponent(GOOGLE_PLAY_URL)};` +
         `end`;
 
-      window.location.replace(intentUrl);
-      return;
+      const fallbackTimer = window.setTimeout(() => {
+        window.location.replace(GOOGLE_PLAY_URL);
+      }, 1500);
+
+      window.location.href = intentUrl;
+
+      return () => {
+        window.clearTimeout(fallbackTimer);
+      };
     }
 
     if (isIOS) {
